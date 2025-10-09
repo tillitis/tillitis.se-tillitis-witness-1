@@ -11,11 +11,11 @@ The complete git history is available at:
 
 Non-trivial changes are announced on the mailing list at:
 
-- [https://lists.tillitis.se/mailman3/postorius/lists/tillitis-announce.lists.tillitis.se/](https://lists.tillitis.se/mailman3/postorius/lists/tillitis-announce.lists.tillitis.se/)
+- [https://lists.tillitis.se/mailman3/postorius/lists/sigsum-ops.lists.tillitis.se/](https://lists.tillitis.se/mailman3/postorius/lists/sigsum-ops.lists.tillitis.se/)
 
 ## Funding
 
-[Tillitis][] is funded by Amagicom.
+[Tillitis][] is funded by Amagicom AB.
 
 Any changes in funding that would *eventually* affect operation of
 `witness.tillitis.se` will be [announced][] at least three years in advance.
