@@ -27,9 +27,13 @@ Any changes in funding that would *eventually* affect operation of
 
 `witness.tillitis.se` implements version 1 of the following specifications:
 
-- [https://c2sp.org/https-bastion](https://c2sp.org/https-bastion)
 - [https://c2sp.org/tlog-cosignature](https://c2sp.org/tlog-cosignature)
 - [https://c2sp.org/tlog-witness](https://c2sp.org/tlog-witness)
+
+The witness use a bastion to be reachable. The specification for
+bastion:
+
+- [https://c2sp.org/https-bastion](https://c2sp.org/https-bastion)
 
 ## Availability
 
