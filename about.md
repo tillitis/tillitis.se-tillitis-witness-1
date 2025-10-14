@@ -1,7 +1,8 @@
-# About `witness.tillitis.se`
+# About `tillitis.se/tillitis-witness-1`
 
 This document describes configuration and operational aspects of
-[Tillitis](https://tillitis.se)'s transparency-log witness `witness.tillitis.se`.
+[Tillitis](https://tillitis.se)'s transparency-log witness
+`tillitis.se/tillitis-witness-1`.
 
 ## Changes to this document
 
@@ -18,27 +19,30 @@ Non-trivial changes are announced on the mailing list at:
 [Tillitis][] is funded by Amagicom AB.
 
 Any changes in funding that would *eventually* affect operation of
-`witness.tillitis.se` will be [announced][] at least three years in advance.
+`tillitis.se/tillitis-witness-1` will be [announced][] at least three
+years in advance.
 
 [Tillitis]: https://tillitis.se/
 [announced]: #changes-to-this-document
 
 ## Interoperability
 
-`witness.tillitis.se` implements version 1 of the following specifications:
+`tillitis.se/tillitis-witness-1` implements version 1 of the following
+specifications:
 
 - [https://c2sp.org/tlog-cosignature](https://c2sp.org/tlog-cosignature)
 - [https://c2sp.org/tlog-witness](https://c2sp.org/tlog-witness)
 
-The witness use a bastion to be reachable. The specification for
-bastion:
+The witness uses bastion service to be reachable. The specification
+for bastion:
 
 - [https://c2sp.org/https-bastion](https://c2sp.org/https-bastion)
 
 ## Availability
 
-Any plans to discontinue `witness.tillitis.se` or the version 1 specifications
-that it complies with will be [announced][] at least one year in advance.
+Any plans to discontinue `tillitis.se/tillitis-witness-1` or the
+version 1 specifications that it complies with will be [announced][]
+at least one year in advance.
 
 Operational issues are tended to during regular working hours.  This
 means weekdays between 08:00 and 17:00 CET/CEST, unless during [public
@@ -120,7 +124,8 @@ Expect a response within three working days.
 
 For log operators and trust policies:
 
-- FIXME: **Verification key:** `witness.tillitis.se+90ad80e...`
+- **Verification key:**
+`tillitis.se/tillitis-witness-1+bb9222e1+BFr35lOFBDC9ot80/JyAIpnHBekhHX3dR+UWJwQFMKUH`
 
 The above key is in vkey format.  You may find [sigsum-key][] helpful for
 conversions between this and other verification-key formats.
