@@ -8,7 +8,7 @@ This document describes configuration and operational aspects of
 
 The complete git history is available at:
 
-- [https://github.com/tillitis/witness.tillitis.se](https://github.com/tillitis/witness.tillitis.se)
+- [https://github.com/tillitis/tillitis.se-tillitis-witness-1](https://github.com/tillitis/tillitis.se-tillitis-witness-1)
 
 Non-trivial changes are announced on the mailing list at:
 
@@ -56,7 +56,7 @@ Other noteworthy events are [announced][] as soon as possible.
 
 How to report operational issues:
 
-- [https://github.com/tillitis/witness.tillitis.se/issues](https://github.com/tillitis/witness.tillitis.se/issues)
+- [https://github.com/tillitis/tillitis.se-tillitis-witness-1/issues](https://github.com/tillitis/tillitis.se-tillitis-witness-1/issues)
 
 Where to find information about past operational issues:
 
