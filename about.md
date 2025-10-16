@@ -127,7 +127,7 @@ For log operators and trust policies:
 - **Verification key:**
 `tillitis.se/tillitis-witness-1+bb9222e1+BFr35lOFBDC9ot80/JyAIpnHBekhHX3dR+UWJwQFMKUH`
 
-The above key is in vkey format.  You may find [sigsum-key][] helpful for
+The above key is in vkey format. You may find [sigsum-key][] helpful for
 conversions between this and other verification-key formats.
 
 [sigsum-key]: https://git.glasklar.is/sigsum/core/sigsum-go/-/tree/main/cmd/sigsum-key
