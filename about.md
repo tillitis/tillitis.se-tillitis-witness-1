@@ -72,22 +72,27 @@ Where to find information about past operational issues:
 - **System software:** Based on Debian 13 (Trixie).
   - Automatic updates are enabled, checking once per day.
   - System is rebooting automatically into new kernel.
-  - System time is synchronized with gbg1.ntp.se, gbg2.ntp.se, sth1.ntp.se, sth2.ntp.se, mmo1.ntp.se, mmo2.ntp.se, using systemd.
-- **Witness software:** [litewitness](https://github.com/FiloSottile/torchwood/tree/main/cmd/litewitness).
+  - System time is synchronized with gbg1.ntp.se, gbg2.ntp.se,
+  sth1.ntp.se, sth2.ntp.se, mmo1.ntp.se, mmo2.ntp.se, using systemd.
+- **Witness software:**
+[litewitness](https://github.com/FiloSottile/torchwood/tree/main/cmd/litewitness).
   - Versions are bumped manually after review.
 - **Key management:** Signing key is kept in a TKey.
-  - [Tkey](https://www.tillitis.se) with [tkey-ssh-agent](https://github.com/tillitis/tkey-ssh-agent).
-  - FIXME: [](https://git.glasklar.is/glasklar/trust/audit-log)
+  - [Tkey](https://www.tillitis.se) with
+  [tkey-ssh-agent](https://github.com/tillitis/tkey-ssh-agent).
+  - [https://github.com/tillitis/.github/blob/main/sigsum/key-mgmnt/audit-logs/audit-log-witness.md](https://github.com/tillitis/.github/blob/main/sigsum/key-mgmnt/audit-logs/audit-log-witness.md)
 - **Physical access:** Employees at [Tillitis][] (Sweden).
 - **Remote access:** Employees at [Tillitis][].
-  - `ssh-ed25519` keys only, no passwords.
-- **Service redundancy:** Little.
-  - Power and internet connectivity outages will render the service unavailable.
+  - `ssh-ed25519` keys only on personal TKey, no passwords.
+- **Service redundancy:** None.
+  - Power and internet connectivity outages will render the service
+  unavailable.
     - UPS for shorter interruptions (tens of minutes).
   - Hardware failures will render the service unavailable.
 - **Key backup:** Yes.
-  - FIXME: [https://github.com/tillitis/.github/blob/key-mgmnt/sigsum/key-mgmnt/docs/sigsum-key-management.md](https://github.com/tillitis/.github/blob/key-mgmnt/sigsum/key-mgmnt/docs/sigsum-key-management.md)
-- **Availability monitoring:** Physical buzzer if signing does not function.
+  - [https://github.com/tillitis/.github/blob/key-mgmnt/sigsum/key-mgmnt/docs/sigsum-key-management.md](https://github.com/tillitis/.github/blob/key-mgmnt/sigsum/key-mgmnt/docs/sigsum-key-management.md)
+- **Availability monitoring:** Physical buzzer if signing does not
+function.
 
 ## How to request witnessing of a log
 
