@@ -1,0 +1,87 @@
+---
+- name: Check if witnessctl binary exists
+  ansible.builtin.stat:
+    path: "{{ witnessctl_bin }}"
+  register: witnessctl_stat
+
+- name: Install witnessctl
+  ansible.builtin.command: >
+    {{ gobin }} install {{ witnessctl_url }}@{{ witness_version }}
+  when: witnessctl_stat.stat.exists != true
+
+- name: Check if litewitness binary exists
+  ansible.builtin.stat:
+    path: "{{ litewitness_bin }}"
+  register: litewitness_stat
+
+- name: Install litewitness
+  ansible.builtin.command: >
+    {{ gobin }} install {{ litewitness_url }}@{{ witness_version }}
+  when: litewitness_stat.stat.exists != true
+
+- name: Check if log is already added to witness DB
+  ansible.builtin.command: >
+    {{ witnessctl_bin }} list-logs -db {{ witness_db }}
+  register: witness_logs
+  changed_when: false
+  failed_when: false
+
+- name: Create witness directory
+  ansible.builtin.file:
+    path: "{{ witness_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Add Glasklar seasalp sigsum log
+  ansible.builtin.command: >
+    {{ witnessctl_bin }} add-sigsum-log
+    -key {{ sigsum_log_key }}
+    -db {{ witness_db }}
+  when: "'sigsum.org' not in witness_logs.stdout"
+
+- name: Add litewitness systemd user service file
+  ansible.builtin.copy:
+    dest: /usr/lib/systemd/user/litewitness.service
+    content: |
+      [Unit]
+      Description=Witnessing of append-only transparency logs
+      Requires=tkey-ssh-agent.service
+      Wants=network-online.target
+      After=tkey-ssh-agent.service network-online.target
+      
+      [Service]
+      Type=simple
+      StandardError=journal
+      ExecStart={{ ansible_env.HOME }}/go/bin/litewitness \
+        -name {{ sigsum_log_name }} \
+        -ssh-agent %t/tkey-ssh-agent/sock \
+        -key {{ sigsum_pub_key }} \
+        -bastion {{ sigsum_bastion }} \
+        -db {{ witness_db }}
+      Restart=on-failure
+      RestartSec=1m
+      
+      [Install]
+      WantedBy=default.target
+      
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Reload systemd manager configuration
+  ansible.builtin.systemd:
+    daemon_reload: true
+    scope: user
+
+- name: Enable litewitness (user service)
+  ansible.builtin.systemd:
+    name: litewitness.service
+    enabled: true
+    scope: user
+
+- name: Start litewitness (user service)
+  ansible.builtin.systemd:
+    name: litewitness.service
+    state: restarted
+    scope: user

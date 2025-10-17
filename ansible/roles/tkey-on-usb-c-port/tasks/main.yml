@@ -1,0 +1,35 @@
+---
+- name: Ensure [pi5] section exists before [all]
+  ansible.builtin.lineinfile:
+    path: /boot/firmware/config.txt
+    line: "[pi5]"
+    insertbefore: '^\[all\]'
+    state: present
+  become: true
+
+- name: Check if 'dtoverlay=dwc2,dr_mode=host' exists under [pi5]
+  ansible.builtin.shell: awk '/^\[pi5\]/ { flag=1; next } /^\[/ { flag=0 } flag && /dtoverlay=dwc2,dr_mode=host/' /boot/firmware/config.txt
+  register: dtoverlay_check
+  changed_when: false
+  failed_when: false
+
+- name: Add 'dtoverlay=dwc2,dr_mode=host' line under [pi5] if missing
+  ansible.builtin.command: sed -i '/^\[pi5\]/a dtoverlay=dwc2,dr_mode=host' /boot/firmware/config.txt
+  when: dtoverlay_check.stdout == ""
+  register: dtoverlay_line
+  changed_when: dtoverlay_line.rc == 0 and dtoverlay_line.stdout == ""
+  become: true
+  # We use sed here instead of lineinfile beacuse lineinfile can't handle if the
+  # same line that we want to insert already exists in several places in a file
+  # but under other sections. In that case lineinfile just ignores to perform any
+  # actions.
+
+- name: Reboot if the dtoverlay line was added
+  ansible.builtin.reboot:
+    msg: "Rebooting after added dtoverlay line"
+    connect_timeout: 5
+    reboot_timeout: 600
+    pre_reboot_delay: 5
+    post_reboot_delay: 10
+  when: dtoverlay_line.changed
+  become: true

@@ -1,0 +1,143 @@
+---
+- name: Add ssh-alarm script
+  ansible.builtin.copy:
+    dest: /usr/local/bin/ssh-alarm.sh
+    content: |
+      #!/bin/bash
+      # Two-thread alarm buzzer for checking that tkey-ssh-agent is alive
+      
+      set -u
+      
+      # --- Configurable parameters ---
+      EXPECTED_KEY="256 SHA256:89QyyZ0uwWCUM4Fy+4UEMEY+3RWHrTZ7wILbiiN/NbE TKey (ED25519)"
+      TIMEOUT_SEC=${1:-60}       # Seconds before declaring ssh-add hung
+      WAIT_SEC=${2:-300}         # Seconds after successful key check
+      FIFO="/dev/shm/ssh_alarm_pipe"
+      RAMDISK="/dev/shm"
+      export SSH_AUTH_SOCK="$XDG_RUNTIME_DIR/tkey-ssh-agent/sock"
+      # -------------------------------
+      
+      echo "ssh-add watchdog starting (timeout=$TIMEOUT_SEC s, wait=$WAIT_SEC s."
+      
+      # --- Setup FIFO ---
+      if [ ! -p "$FIFO" ]; then
+          mkfifo "$FIFO"
+      fi
+      
+      # --- Thread 1: SSH checker ---
+      check_thread() {
+          while true; do
+              tmpfile=$(mktemp -p $RAMDISK)
+              # Start ssh-add process in the background
+              ssh-add -l >& "$tmpfile" &
+              pid=$!
+              
+              # Wait up to TIMEOUT_SEC for the process to finish
+              for ((i=0; i<TIMEOUT_SEC; i++)); do
+                  if ! kill -0 "$pid" >& /dev/null; then
+                      break
+                  fi
+                  sleep 1
+              done
+              
+              # Check if process is still running (hung)
+              if kill -0 "$pid" >& /dev/null; then
+                  # Repeatedly write "alarm" to FIFO while hung
+                  while kill -0 "$pid" >& /dev/null; do
+                      echo "ssh-add unresponsive (> $TIMEOUT_SEC s)"
+                      echo "alarm" >"$FIFO"
+                      sleep 1
+                  done
+                  # Still running → hung
+                  wait $pid >& /dev/null || true
+              else
+                  SSH_OUTPUT=$(cat "$tmpfile")
+                  if [ "$SSH_OUTPUT" == "$EXPECTED_KEY" ]; then
+                      echo "ok" >"$FIFO"
+                      echo "ssh-add OK. Waiting $WAIT_SEC s."
+                      sleep "$WAIT_SEC"
+                  else
+                      echo "alarm" >"$FIFO"
+                      echo "ssh-add key mismatch or failure: $SSH_OUTPUT"
+                      sleep 2
+                  fi
+              fi
+              rm -f "$tmpfile"
+          done
+      }
+      
+      # --- Thread 2: Buzzer ---
+      buzzer_thread() {
+          current_state="ok"
+          while true; do
+              # Update state if read succeeds
+              if read -t 1 -r state <"$FIFO"; then
+                  current_state="$state"
+              fi
+              
+              if [ "$current_state" == "alarm" ]; then
+                  # Start buzzer
+                  python3 -c 'from gpiozero import Buzzer; from time import sleep; buzzer = Buzzer(17); buzzer.on(); sleep(1)'
+                  sleep 1
+              fi
+          done
+      }
+      
+      # --- Start threads ---
+      check_thread &
+      CHECK_PID=$!
+      
+      buzzer_thread &
+      BUZZ_PID=$!
+      
+      # --- Graceful shutdown ---
+      trap "kill $CHECK_PID $BUZZ_PID 2>/dev/null; rm -f $FIFO; exit 0" SIGINT SIGTERM
+      
+      wait
+      
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Add ssh-alarm systemd user service
+  ansible.builtin.copy:
+    dest: /usr/lib/systemd/user/ssh-alarm.service
+    content: |
+      [Unit]
+      Description=Sound buzzer alarm if ssh agent is not working
+      Requires=tkey-ssh-agent.service
+      After=tkey-ssh-agent.service
+
+      [Service]
+      Type=simple
+      StandardOutput=null
+      StandardError=null
+      ExecStart=/usr/local/bin/ssh-alarm.sh 5 60
+      Restart=on-failure
+      RestartSec=1m
+
+      [Install]
+      WantedBy=default.target
+      
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Reload systemd manager configuration
+  ansible.builtin.systemd:
+    daemon_reload: true
+    scope: user
+
+- name: Enable ssh-alarm (user service)
+  ansible.builtin.systemd:
+    name: ssh-alarm.service
+    enabled: true
+    scope: user
+
+- name: Start ssh-alarm (user service)
+  ansible.builtin.systemd:
+    name: ssh-alarm.service
+    state: restarted
+    scope: user

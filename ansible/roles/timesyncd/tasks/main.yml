@@ -1,0 +1,28 @@
+---
+- name: Install systemd-timesyncd
+  ansible.builtin.apt:
+    name: systemd-timesyncd
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Ensure systemd-timesyncd service is enabled and running
+  ansible.builtin.systemd:
+    name: systemd-timesyncd
+    enabled: true
+    state: started
+  become: true
+
+- name: Configure NTP servers
+  ansible.builtin.lineinfile:
+    path: /etc/systemd/timesyncd.conf
+    regexp: '^\s*#?NTP='
+    line: 'NTP=gbg1.ntp.se gbg2.ntp.se sth1.ntp.se sth2.ntp.se mmo1.ntp.se mmo2.ntp.se'
+    state: present
+  become: true
+
+- name: Restart systemd-timesyncd to apply configuration
+  ansible.builtin.systemd:
+    name: systemd-timesyncd
+    state: restarted
+  become: true
