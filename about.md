@@ -69,40 +69,33 @@ Where to find information about past operational issues:
 - **Hardware:** Raspberry Pi 5 with a PoE HAT.
   - 8 GiB RAM
   - 128 GiB SD
-- FIXME: **System software:** [Custom-made][], based on Debian 12 (Bookworm).
-  - FIXME: Automatic updates are enabled, checking once per hour.
-  - FIXME: System is rebooting automatically into new kernel.
-  - FIXME: System time is synchronized with 2.debian.pool.ntp.org, using chrony.
-  - FIXME: Validating DNS resolver running locally.
-- FIXME: **Witness software:** [litewitness][] using [sigsum-agent][]
-  - FIXME: Versions are bumped manually after review.
-- FIXME: **Key management:** Signing key is kept in a TKey.
-  - FIXME: [https://github.com/tillitis/.github/blob/key-mgmnt/sigsum/key-mgmnt/docs/sigsum-key-management.md](https://github.com/tillitis/.github/blob/key-mgmnt/sigsum/key-mgmnt/docs/sigsum-key-management.md)
+- **System software:** Based on Debian 13 (Trixie).
+  - Automatic updates are enabled, checking once per day.
+  - System is rebooting automatically into new kernel.
+  - System time is synchronized with gbg1.ntp.se, gbg2.ntp.se, sth1.ntp.se, sth2.ntp.se, mmo1.ntp.se, mmo2.ntp.se, using systemd.
+- **Witness software:** [litewitness](https://github.com/FiloSottile/torchwood/tree/main/cmd/litewitness).
+  - Versions are bumped manually after review.
+- **Key management:** Signing key is kept in a TKey.
+  - [Tkey](https://www.tillitis.se) with [tkey-ssh-agent](https://github.com/tillitis/tkey-ssh-agent).
   - FIXME: [](https://git.glasklar.is/glasklar/trust/audit-log)
-- FIXME: **Physical access:** Employees at [Tillitis][] (Sweden).
-- FIXME: **Remote access:** Sysadmin team at [Tillitis][].
-  - FIXME: `sk-ssh-ed25519@openssh.com` keys only, no passwords.
-  - FIXME: Serial console via management server with the same remote access policy.
+- **Physical access:** Employees at [Tillitis][] (Sweden).
+- **Remote access:** Employees at [Tillitis][].
+  - `ssh-ed25519` keys only, no passwords.
 - **Service redundancy:** Little.
   - Power and internet connectivity outages will render the service unavailable.
-    - UPS for shorter interruptions (minutes) and graceful shutdown.
+    - UPS for shorter interruptions (tens of minutes).
   - Hardware failures will render the service unavailable.
 - **Key backup:** Yes.
   - FIXME: [https://github.com/tillitis/.github/blob/key-mgmnt/sigsum/key-mgmnt/docs/sigsum-key-management.md](https://github.com/tillitis/.github/blob/key-mgmnt/sigsum/key-mgmnt/docs/sigsum-key-management.md)
-- FIXME: **Availability monitoring:** End-to-end [checker jobs][].
+- **Availability monitoring:** Physical buzzer if signing does not function.
 
-FIXME: [custom-made]: https://git.glasklar.is/glasklar/infra/images
-[litewitness]: https://github.com/FiloSottile/litetlog?tab=readme-ov-file#litewitness
-FIXME: [sigsum-agent]: https://git.glasklar.is/sigsum/core/key-mgmt/#repository-overview
-FIXME: [checker jobs]: https://git.glasklar.is/sigsum/admin/checker/-/tree/sigsum
-
-## FIXME: How to request witnessing of a log
+## How to request witnessing of a log
 
 Send an email to the non-public inbox:
 
 - `witness-registry (at) tillitis (dot) se`
 
-FIXME: Specify:
+Specify:
 
 - The log's [verification key][]
   - The key name should be a [schema-less URL][]
@@ -125,7 +118,7 @@ Expect a response within three working days.
 For log operators and trust policies:
 
 - **Verification key:**
-`tillitis.se/tillitis-witness-1+bb9222e1+BFr35lOFBDC9ot80/JyAIpnHBekhHX3dR+UWJwQFMKUH`
+`tillitis.se/tillitis-witness-1+9246694a+BAdr6MnufqYJFvDfNgjJRddzAILss3dJ2tLJ7TOf6ncM`
 
 The above key is in vkey format. You may find [sigsum-key][] helpful for
 conversions between this and other verification-key formats.
