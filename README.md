@@ -1,4 +1,10 @@
 # tillitis.se-tillitis-witness-1
 
-Repository tracks the setup and maintenance of transparency log
-witnesses operated by Tillitis.
+This repository tracks the setup and maintenance of
+[Sigsum](https://www.sigsum.org) witnesses operated by
+[Tillitis](https://tillitis.se)
+
+## Documents
+
+- [about](./about.md)
+- [timeline](./timeline.md)
