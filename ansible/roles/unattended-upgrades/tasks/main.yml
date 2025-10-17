@@ -1,0 +1,50 @@
+---
+- name: Ensure unattended-upgrades is installed
+  ansible.builtin.apt:
+    name: unattended-upgrades
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Enable unattended-upgrades
+  ansible.builtin.copy:
+    dest: /etc/apt/apt.conf.d/20auto-upgrades
+    content: |
+      APT::Periodic::Update-Package-Lists "1";
+      APT::Periodic::Unattended-Upgrade "1";
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Enable removal of unused kernel packages
+  ansible.builtin.lineinfile:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    regexp: '^//Unattended-Upgrade::Remove-Unused-Kernel-Packages'
+    line: 'Unattended-Upgrade::Remove-Unused-Kernel-Packages "true";'
+    state: present
+  become: true
+
+- name: Enable removal of unused dependencies
+  ansible.builtin.lineinfile:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    regexp: '^//?Unattended-Upgrade::Remove-Unused-Dependencies'
+    line: 'Unattended-Upgrade::Remove-Unused-Dependencies "true";'
+    state: present
+  become: true
+
+- name: Enable automatic reboot
+  ansible.builtin.lineinfile:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    regexp: '^//?Unattended-Upgrade::Automatic-Reboot'
+    line: 'Unattended-Upgrade::Automatic-Reboot "true";'
+    state: present
+  become: true
+
+- name: Allow reboot even with logged in users
+  ansible.builtin.lineinfile:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    regexp: '^//?Unattended-Upgrade::Automatic-Reboot-WithUsers'
+    line: 'Unattended-Upgrade::Automatic-Reboot-WithUsers "true";'
+    state: present
+  become: true

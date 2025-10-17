@@ -1,0 +1,21 @@
+---
+- name: Install golang (base version, required to bootstrap)
+  ansible.builtin.apt:
+    name: golang
+    state: present
+  become: true
+
+- name: Check if Go {{ go_version }} is installed
+  ansible.builtin.stat:
+    path: "{{ gobin }}"
+  register: go_version_stat
+
+- name: Install Go {{ go_version }} tool
+  ansible.builtin.command: >
+    go install golang.org/dl/go{{ go_version }}@latest
+  when: go_version_stat.stat.exists != true
+
+- name: Download complete Go {{ go_version }}
+  ansible.builtin.command: >
+    {{ gobin }} download
+  when: go_version_stat.stat.exists != true

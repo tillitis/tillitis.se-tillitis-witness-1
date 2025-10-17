@@ -1,0 +1,321 @@
+---
+- name: Ensure iptables is installed
+  ansible.builtin.apt:
+    name:
+      - iptables
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Ensure /etc/iptables directory exists
+  ansible.builtin.file:
+    path: /etc/iptables
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  
+- name: Add IPv4 firewall script
+  ansible.builtin.copy:
+    dest: /etc/iptables/iptables.sh
+    content: |
+      #!/bin/bash
+      
+      # Set a known state
+      iptables -w -P INPUT   DROP
+      iptables -w -P FORWARD DROP
+      iptables -w -P OUTPUT  DROP
+      
+      # Flush and delete possibly existing chains
+      iptables -w -F
+      iptables -w -X
+      iptables -w -Z
+      
+      iptables -w -t filter -F
+      iptables -w -t filter -X
+      iptables -w -t filter -Z
+      
+      iptables -w -t nat -F
+      iptables -w -t nat -X
+      iptables -w -t nat -Z
+      
+      iptables -w -t mangle -F
+      iptables -w -t mangle -X
+      iptables -w -t mangle -Z
+      
+      iptables -w -t raw -F
+      iptables -w -t raw -X
+      iptables -w -t raw -Z
+      
+      iptables -w -t security -F
+      iptables -w -t security -X
+      iptables -w -t security -Z
+      
+      # Create firewall chain that drops all packets that enters
+      iptables -w -N FIREWALL
+      iptables -w -A FIREWALL -j DROP
+      
+      #
+      # INPUT
+      #
+      
+      # Accept incoming packets on loopback
+      iptables -w -A INPUT -i lo -j ACCEPT
+
+      # Accept incoming ping packets
+      iptables -w -A INPUT -p icmp --icmp-type echo-request -j ACCEPT
+
+      # Accept incoming SSH
+      iptables -w -A INPUT -p TCP --dport 22 -j ACCEPT
+      
+      # Deny all incoming TCP packets that have the SYN,RST,ACK/SYN flag
+      iptables -w -A INPUT -p TCP --syn -j FIREWALL
+      
+      # Accept packets for established or related connections
+      iptables -w -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+      
+      # Deny all incoming TCP packets
+      iptables -w -A INPUT -p TCP -j FIREWALL
+      
+      # Deny all incoming UDP packets
+      iptables -w -A INPUT -p UDP -j FIREWALL
+      
+      # Deny all incoming ICMP packets
+      iptables -w -A INPUT -p ICMP -j FIREWALL
+      
+      # Drop everything else
+      iptables -w -A INPUT -j DROP
+      
+      #
+      # OUTPUT
+      #
+      
+      # Accept all outgoing packets on any interface to any ip for any service
+      iptables -w -A OUTPUT -j ACCEPT
+      
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Add IPv6 firewall script
+  ansible.builtin.copy:
+    dest: /etc/iptables/ip6tables.sh
+    content: |
+      #!/bin/bash
+      
+      # Set a known state
+      ip6tables -w -P INPUT   DROP
+      ip6tables -w -P FORWARD DROP
+      ip6tables -w -P OUTPUT  DROP
+      
+      # Flush and delete possibly existing chains
+      ip6tables -w -F
+      ip6tables -w -X
+      ip6tables -w -Z
+      
+      ip6tables -w -t filter -F
+      ip6tables -w -t filter -X
+      ip6tables -w -t filter -Z
+      
+      ip6tables -w -t nat -F
+      ip6tables -w -t nat -X
+      ip6tables -w -t nat -Z
+      
+      ip6tables -w -t mangle -F
+      ip6tables -w -t mangle -X
+      ip6tables -w -t mangle -Z
+      
+      ip6tables -w -t raw -F
+      ip6tables -w -t raw -X
+      ip6tables -w -t raw -Z
+      
+      ip6tables -w -t security -F
+      ip6tables -w -t security -X
+      ip6tables -w -t security -Z
+      
+      # Create firewall chain that drops all packets that enters
+      ip6tables -w -N FIREWALL
+      ip6tables -w -A FIREWALL -j DROP
+      
+      #
+      # INPUT
+      #
+      
+      # Accept incoming packets on loopback
+      ip6tables -w -A INPUT -i lo -j ACCEPT
+
+      # Accept incoming SSH
+      ip6tables -w -A INPUT -p TCP --dport 22 -j ACCEPT
+      
+      # Deny all incoming TCP packets that have the SYN,RST,ACK/SYN flag
+      ip6tables -w -A INPUT -p TCP --syn -j FIREWALL
+      
+      # Accept packets for established or related connections
+      ip6tables -w -A INPUT -m conntrack --ctstate ESTABLISHED,RELATED -j ACCEPT
+      
+      # Deny all incoming TCP packets
+      ip6tables -w -A INPUT -p TCP -j FIREWALL
+      
+      # Deny all incoming UDP packets
+      ip6tables -w -A INPUT -p UDP -j FIREWALL
+      
+      # Deny all incoming ICMP packets
+      ip6tables -w -A INPUT -p ICMP -j FIREWALL
+      
+      # Drop everything else
+      ip6tables -w -A INPUT -j DROP
+      
+      #
+      # OUTPUT
+      #
+      
+      # Accept all outgoing packets on any interface to any ip for any service
+      ip6tables -w -A OUTPUT -j ACCEPT
+      
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  
+- name: Add IPv4 firewall flush script
+  ansible.builtin.copy:
+    dest: /etc/iptables/flush-iptables.sh
+    content: |
+      #!/bin/bash
+      iptables -w -F
+      iptables -w -X
+      iptables -w -Z
+      
+      iptables -w -t filter -F
+      iptables -w -t filter -X
+      iptables -w -t filter -Z
+      
+      iptables -w -t nat -F
+      iptables -w -t nat -X
+      iptables -w -t nat -Z
+      
+      iptables -w -t mangle -F
+      iptables -w -t mangle -X
+      iptables -w -t mangle -Z
+      
+      iptables -w -t raw -F
+      iptables -w -t raw -X
+      iptables -w -t raw -Z
+      
+      iptables -w -t security -F
+      iptables -w -t security -X
+      iptables -w -t security -Z
+      
+      iptables -w -P INPUT ACCEPT
+      iptables -w -P FORWARD ACCEPT
+      iptables -w -P OUTPUT ACCEPT
+
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Add IPv6 firewall flush script
+  ansible.builtin.copy:
+    dest: /etc/iptables/flush-ip6tables.sh
+    content: |
+      #!/bin/bash
+      ip6tables -w -F
+      ip6tables -w -X
+      ip6tables -w -Z
+      
+      ip6tables -w -t filter -F
+      ip6tables -w -t filter -X
+      ip6tables -w -t filter -Z
+      
+      ip6tables -w -t nat -F
+      ip6tables -w -t nat -X
+      ip6tables -w -t nat -Z
+      
+      ip6tables -w -t mangle -F
+      ip6tables -w -t mangle -X
+      ip6tables -w -t mangle -Z
+      
+      ip6tables -w -t raw -F
+      ip6tables -w -t raw -X
+      ip6tables -w -t raw -Z
+      
+      ip6tables -w -t security -F
+      ip6tables -w -t security -X
+      ip6tables -w -t security -Z
+      
+      ip6tables -w -P INPUT ACCEPT
+      ip6tables -w -P FORWARD ACCEPT
+      ip6tables -w -P OUTPUT ACCEPT
+
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Add IPv4 firewall service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/iptables.service
+    content: |
+      [Unit]
+      Description=Packet Filtering Framework
+      DefaultDependencies=no
+      After=systemd-sysctl.service
+      Before=sysinit.target
+      [Service]
+      Type=oneshot
+      ExecStart=/etc/iptables/iptables.sh
+      ExecReload=/etc/iptables/iptables.sh
+      ExecStop=/etc/iptables/flush-iptables.sh
+      RemainAfterExit=yes
+      [Install]
+      WantedBy=multi-user.target
+      
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+  
+- name: Add IPv6 firewall service
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/ip6tables.service
+    content: |
+      [Unit]
+      Description=Packet Filtering Framework
+      DefaultDependencies=no
+      After=systemd-sysctl.service
+      Before=sysinit.target
+      [Service]
+      Type=oneshot
+      ExecStart=/etc/iptables/ip6tables.sh
+      ExecReload=/etc/iptables/ip6tables.sh
+      ExecStop=/etc/iptables/flush-ip6tables.sh
+      RemainAfterExit=yes
+      [Install]
+      WantedBy=multi-user.target
+      
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Reload systemd manager configuration
+  ansible.builtin.systemd:
+    daemon_reload: true
+  become: true
+
+- name: Enable and start iptables
+  ansible.builtin.systemd:
+    name: iptables.service
+    enabled: true
+    state: restarted
+  become: true
+
+- name: Enable and start ip6tables
+  ansible.builtin.systemd:
+    name: ip6tables.service
+    enabled: true
+    state: restarted
+  become: true

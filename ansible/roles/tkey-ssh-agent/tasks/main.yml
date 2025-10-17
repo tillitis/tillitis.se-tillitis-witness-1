@@ -1,0 +1,159 @@
+---
+# Reproducable build
+# git clone -b v1.0.2 https://github.com/tillitis/tkey-device-signer.git
+# (cd tkey-device-signer && sed -i s/"make -j"/"make -j TKEY_SIGNER_APP_NO_TOUCH=yes"/ Makefile && ./build-podman.sh)
+# git clone -b v1.0.0 https://github.com/tillitis/tkey-ssh-agent.git
+# (cp -av tkey-device-signer/signer/app.bin tkey-ssh-agent/cmd/tkey-ssh-agent/signer.bin-v1.0.0)
+# (cd tkey-ssh-agent/cmd/tkey-ssh-agent && sha512sum signer.bin-v1.0.0 > signer.bin.sha512)
+# (cd tkey-ssh-agent && sed -i s/"-it ghcr.io\/tillitis\/tkey-builder:4 make -j"/"-e GOARCH=arm64 -it ghcr.io\/tillitis\/tkey-builder:4 make -j  TKEY_SIGNER_APP_NO_TOUCH=yes"/ Makefile && make podman)
+# sha256sum of tkey-ssh-agent: e64b4d47682878127fa86eba47829a54a6c2d8931756070f9335623b0eb6d9f1
+
+
+- name: Copy local tkey-ssh-agent to remote host
+  ansible.builtin.copy:
+    src: tkey-ssh-agent
+    dest: /usr/bin/tkey-ssh-agent
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Copy local tkey-ssh-agent.1 man page to remote host
+  ansible.builtin.copy:
+    src: tkey-ssh-agent.1
+    dest: /usr/share/man/man1/tkey-ssh-agent.1
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Add tkey-ssh-agent systemd user service file
+  ansible.builtin.copy:
+    dest: /usr/lib/systemd/user/tkey-ssh-agent.service
+    content: |
+      [Unit]
+      Description=An SSH agent backed by Tillitis TKey
+      Documentation=https://github.com/tillitis/tkey-ssh-agent
+      
+      [Service]
+      ExecStart=/usr/bin/tkey-ssh-agent --uss --agent-path %t/tkey-ssh-agent/sock --pinentry /usr/local/bin/pinentry-systemd-ask
+      ExecReload=/usr/bin/kill -HUP $MAINPID
+      NoNewPrivileges=yes
+      KeyringMode=private
+      UMask=0177
+      ProtectSystem=strict
+      RuntimeDirectory=tkey-ssh-agent
+      RuntimeDirectoryMode=0700
+      ReadWritePaths=/dev /run
+      RestrictAddressFamilies=AF_UNIX
+      RestrictNamespaces=yes
+      RestrictRealtime=yes
+      RestrictSUIDSGID=yes
+      LockPersonality=yes
+      SystemCallFilter=@system-service
+      SystemCallFilter=~@privileged @resources
+      SystemCallErrorNumber=EPERM
+      SystemCallArchitectures=native
+      StandardOutput=null
+      
+      [Install]
+      WantedBy=default.target
+      
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Add tkey udev rules file
+  ansible.builtin.copy:
+    dest: /usr/lib/udev/rules.d/60-tkey.rules
+    content: |
+      # Mark Tillitis TKey as a security token. /usr/lib/udev/rules.d/70-uaccess.rules
+      # will add TAG "uaccess", which will result in file ACLs so that local user
+      # (see loginctl) can read/write to the serial port in /dev.
+      ATTRS{idVendor}=="1207", ATTRS{idProduct}=="8887",\
+      ENV{ID_SECURITY_TOKEN}="1"
+    owner: root
+    group: root
+    mode: '0644'
+  become: true
+
+- name: Add pinentry-systemd-ask file
+  ansible.builtin.copy:
+    dest: /usr/local/bin/pinentry-systemd-ask
+    content: |
+      #!/bin/bash
+      # Minimal pinentry that uses systemd-ask-password
+      # Compatible with gpg-agent/go-pinentry-minimal
+      
+      set -euo pipefail
+      
+      DESC="Enter passphrase:"
+      PROMPT=""
+      TITLE=""
+      
+      echo "OK"
+      
+      while IFS= read -r line; do
+          case "$line" in
+              SETDESC*)
+                  DESC="${line#SETDESC }"
+                  echo "OK"
+                  ;;
+              SETPROMPT*)
+                  PROMPT="${line#SETPROMPT }"
+                  echo "OK"
+                  ;;
+              SETTITLE*)
+                  TITLE="${line#SETTITLE }"
+                  echo "OK"
+                  ;;
+              OPTION*)
+                  # Accept and ignore options
+                  echo "OK"
+                  ;;
+              GETPIN*)
+                  # Compose the message (some pinentries show PROMPT or DESC)
+                  MSG="${DESC:-$PROMPT}"
+                  # systemd-ask-password needs the XDG_RUNTIME_DIR environment variable
+                  # set to know how to communicate with systemd-tty-ask-password-agent
+                  PASS=$(systemd-ask-password --no-tty --timeout=0 "$MSG") || {
+                      echo "ERR 1 systemd-ask-password failed"
+                      continue
+                  }
+                  printf 'D %s\n' "$PASS"
+                  unset PASS
+                  echo "OK"
+                  ;;
+              BYE*)
+                  echo "OK"
+                  exit 0
+                  ;;
+              *)
+                  # Respond OK to everything else
+                  echo "OK"
+                  ;;
+          esac
+      done
+      
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+
+- name: Reload systemd manager configuration
+  ansible.builtin.systemd:
+    daemon_reload: true
+    scope: user
+
+- name: Enable tkey-ssh-agent (user service)
+  ansible.builtin.systemd:
+    name: tkey-ssh-agent.service
+    enabled: true
+    scope: user
+
+- name: Start tkey-ssh-agent (user service)
+  ansible.builtin.systemd:
+    name: tkey-ssh-agent.service
+    state: restarted
+    scope: user

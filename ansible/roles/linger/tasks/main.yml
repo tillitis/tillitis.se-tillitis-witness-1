@@ -1,0 +1,4 @@
+---
+- name: Enable lingering for user 'witness'
+  ansible.builtin.command: loginctl enable-linger witness
+  become: true

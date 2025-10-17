@@ -1,0 +1,52 @@
+---
+- name: Ensure [pi5] section exists before [all]
+  ansible.builtin.lineinfile:
+    path: /boot/firmware/config.txt
+    line: "[pi5]"
+    insertbefore: '^\[all\]'
+    state: present
+  become: true
+
+- name: Check if 'dtoverlay=disable-wifi' exists under [pi5]
+  ansible.builtin.shell: awk '/^\[pi5\]/ { flag=1; next } /^\[/ { flag=0 } flag && /dtoverlay=disable-wifi/' /boot/firmware/config.txt
+  register: dtoverlay_check_wifi
+  changed_when: false
+  failed_when: false
+
+- name: Add 'dtoverlay=disable-wifi' line under [pi5] if missing (disable WiFi)
+  ansible.builtin.command: sed -i '/^\[pi5\]/a dtoverlay=disable-wifi' /boot/firmware/config.txt
+  when: dtoverlay_check_wifi.stdout == ""
+  register: dtoverlay_wifi_line
+  changed_when: dtoverlay_wifi_line.rc == 0 and dtoverlay_wifi_line.stdout == ""
+  become: true
+  # We use sed here instead of lineinfile beacuse lineinfile can't handle if the
+  # same line that we want to insert already exists in several places in a file
+  # but under other sections. In that case lineinfile just ignores to perform any
+  # actions.
+  
+- name: Check if 'dtoverlay=disable-bt' exists under [pi5]
+  ansible.builtin.shell: awk '/^\[pi5\]/ { flag=1; next } /^\[/ { flag=0 } flag && /dtoverlay=disable-bt/' /boot/firmware/config.txt
+  register: dtoverlay_check_bt
+  changed_when: false
+  failed_when: false
+
+- name: Add 'dtoverlay=disable-bt' line under [pi5] if missing (disable Bluetooth)
+  ansible.builtin.command: sed -i '/^\[pi5\]/a dtoverlay=disable-bt' /boot/firmware/config.txt
+  when: dtoverlay_check_bt.stdout == ""
+  register: dtoverlay_bt_line
+  changed_when: dtoverlay_bt_line.rc == 0 and dtoverlay_bt_line.stdout == ""
+  become: true
+  # We use sed here instead of lineinfile beacuse lineinfile can't handle if the
+  # same line that we want to insert already exists in several places in a file
+  # but under other sections. In that case lineinfile just ignores to perform any
+  # actions.
+  
+- name: Reboot if any line was added
+  ansible.builtin.reboot:
+    msg: "Rebooting after added dtoverlay line"
+    connect_timeout: 5
+    reboot_timeout: 600
+    pre_reboot_delay: 5
+    post_reboot_delay: 10
+  when: dtoverlay_wifi_line.changed or dtoverlay_bt_line.changed
+  become: true

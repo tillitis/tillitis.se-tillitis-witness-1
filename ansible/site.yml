@@ -1,0 +1,48 @@
+---
+- name: Update all packages and reboot if needed
+  hosts: all
+  roles:
+    - apt-get-update
+
+- name: Add and configure firewall with ssh port 22 open
+  hosts: all
+  roles:
+    - firewall
+
+- name: Install unattended-upgrades and configure
+  hosts: all
+  roles:
+    - unattended-upgrades
+
+- name: Set locale
+  hosts: all
+  roles:
+    - locale
+
+- name: Install and configure timesyncd
+  hosts: all
+  roles:
+    - timesyncd
+
+- name: Disable WiFi and Bluetooth
+  hosts: all
+  roles:
+    - disable-wifi-bluetooth
+
+- name: Enable TKey access on USB-C port and signal to reboot if needed
+  hosts: all
+  roles:
+    - tkey-on-usb-c-port
+
+- name: Setup litewitness environment
+  hosts: all
+  roles:
+    - golang
+    - linger
+    - tkey-ssh-agent
+    - witness
+
+- name: Setup and enable ssh-alarm
+  hosts: all
+  roles:
+    - ssh-alarm
