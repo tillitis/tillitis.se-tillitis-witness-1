@@ -1,0 +1,10 @@
+# https://seasalp.glasklar.is/get-tree-head
+sigsum_log_key:  "0ec7e16843119b120377a73913ac6acbc2d03d82432e2c36b841b09a95841f25"
+
+# cosignature=774fafee07d3b0d9399d669676440a6301db9fa8fe2140d7d352418da25144c5
+sigsum_log_name: "tillitis.se/tillitis-witness-1"
+sigsum_pub_key:  "SHA256:89QyyZ0uwWCUM4Fy+4UEMEY+3RWHrTZ7wILbiiN/NbE"
+
+sigsum_bastion:  "bastion.glasklar.is:443"
+
+ssh_alarm_expected_key: "256 {{sigsum_pub_key}} TKey (ED25519)"

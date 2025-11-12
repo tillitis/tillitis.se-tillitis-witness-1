@@ -59,7 +59,11 @@ ssh-copy-id witness@<IP>
 
 The ansible version used to deploy this configuration was "ansible [core 2.17.14]".
 
-Run:
+To provision a specific witness:
 ---
-ansible-playbook -i hosts.ini -u witness site.yml -v
+ansible-playbook -i hosts.ini -u witness site.yml -v --limit <witness_name_from_hosts.ini>
+---
+example:
+---
+ansible-playbook -i hosts.ini -u witness site.yml -v --limit test_witness_1
 ---

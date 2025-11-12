@@ -12,8 +12,3 @@ witness_db:      "{{ witness_dir }}/litewitness.db"
 litewitness_url: "filippo.io/torchwood/cmd/litewitness"
 witnessctl_url:  "filippo.io/torchwood/cmd/witnessctl"
 
-# https://seasalp.glasklar.is
-sigsum_log_key:  "0ec7e16843119b120377a73913ac6acbc2d03d82432e2c36b841b09a95841f25"
-sigsum_log_name: "tillitis.se/tillitis-witness-1"
-sigsum_pub_key:  "SHA256:89QyyZ0uwWCUM4Fy+4UEMEY+3RWHrTZ7wILbiiN/NbE"
-sigsum_bastion:  "bastion.glasklar.is:443"

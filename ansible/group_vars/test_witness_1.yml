@@ -1,0 +1,10 @@
+# https://test.sigsum.org/barreleye/get-tree-head
+sigsum_log_key:  "4644af2abd40f4895a003bca350f9d5912ab301a49c77f13e5b6d905c20a5fe6"
+
+# cosignature=e4a6a1e4657d8d7a187cc0c20ed51055d88c72f340d29534939aee32d86b4021
+sigsum_log_name: "tillitis.se/test-witness-1"
+sigsum_pub_key:  "SHA256:himRdNE8lyDF2nMzmP21E3TNzV/N1954PQQ7EUdyb8k"
+
+sigsum_bastion:  "bastion.glasklar.is:443"
+
+ssh_alarm_expected_key: "256 {{sigsum_pub_key}} TKey (ED25519)"

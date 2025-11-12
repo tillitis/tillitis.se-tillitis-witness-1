@@ -9,7 +9,7 @@
       set -u
       
       # --- Configurable parameters ---
-      EXPECTED_KEY="256 SHA256:89QyyZ0uwWCUM4Fy+4UEMEY+3RWHrTZ7wILbiiN/NbE TKey (ED25519)"
+      EXPECTED_KEY="{{ ssh_alarm_expected_key }}"
       TIMEOUT_SEC=${1:-60}       # Seconds before declaring ssh-add hung
       WAIT_SEC=${2:-300}         # Seconds after successful key check
       FIFO="/dev/shm/ssh_alarm_pipe"
