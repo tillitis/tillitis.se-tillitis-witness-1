@@ -1,23 +1,25 @@
 ---
-- name: Check if witnessctl binary exists
-  ansible.builtin.stat:
-    path: "{{ witnessctl_bin }}"
-  register: witnessctl_stat
+- name: Check witnessctl version
+  ansible.builtin.command: >
+    {{ gobin }} version -m go/bin/witnessctl
+  register: witnessctl_version_output
+  ignore_errors: yes
 
-- name: Install witnessctl
+- name: Install witnessctl if the correct version is not present
   ansible.builtin.command: >
     {{ gobin }} install {{ witnessctl_url }}@{{ witness_version }}
-  when: witnessctl_stat.stat.exists != true
+  when: witnessctl_version_output.stdout is not search('mod.*filippo.io/torchwood.*' ~ witness_version)
 
-- name: Check if litewitness binary exists
-  ansible.builtin.stat:
-    path: "{{ litewitness_bin }}"
-  register: litewitness_stat
+- name: Check litewitness version
+  ansible.builtin.command: >
+     {{ gobin }} version -m go/bin/litewitness
+  register: litewitness_version_output
+  ignore_errors: yes
 
-- name: Install litewitness
+- name: Install litewitness if the correct version is not present
   ansible.builtin.command: >
     {{ gobin }} install {{ litewitness_url }}@{{ witness_version }}
-  when: litewitness_stat.stat.exists != true
+  when: litewitness_version_output.stdout is not search('mod.*filippo.io/torchwood.*' ~ witness_version)
 
 - name: Check if log is already added to witness DB
   ansible.builtin.command: >
