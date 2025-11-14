@@ -52,6 +52,7 @@
       [Service]
       Type=simple
       StandardError=journal
+      ExecStartPre=/bin/sleep 3
       ExecStart={{ ansible_env.HOME }}/go/bin/litewitness \
         -name {{ sigsum_log_name }} \
         -ssh-agent %t/tkey-ssh-agent/sock \

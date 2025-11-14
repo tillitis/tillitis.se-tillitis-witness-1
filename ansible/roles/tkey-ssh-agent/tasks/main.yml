@@ -34,6 +34,8 @@
       [Unit]
       Description=An SSH agent backed by Tillitis TKey
       Documentation=https://github.com/tillitis/tkey-ssh-agent
+      PartOf=litewitness.service
+      Before=litewitness.service
       
       [Service]
       ExecStart=/usr/bin/tkey-ssh-agent --uss --agent-path %t/tkey-ssh-agent/sock --pinentry /usr/local/bin/pinentry-systemd-ask
