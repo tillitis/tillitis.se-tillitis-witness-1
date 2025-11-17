@@ -34,12 +34,13 @@
     state: directory
     mode: '0755'
 
-- name: Add Glasklar seasalp sigsum log
+- name: Add sigsum logs
   ansible.builtin.command: >
     {{ witnessctl_bin }} add-sigsum-log
-    -key {{ sigsum_log_key }}
+    -key {{ item.key }}
     -db {{ witness_db }}
-  when: "'sigsum.org' not in witness_logs.stdout"
+  loop: "{{ sigsum_logs }}"
+  when: item.hash not in witness_logs.stdout
 
 - name: Add litewitness systemd user service file
   ansible.builtin.copy:

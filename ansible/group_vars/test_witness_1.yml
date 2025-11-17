@@ -1,8 +1,13 @@
 go_version:      "1.24.10"
 witness_version: "v0.6.1"
 
-# https://test.sigsum.org/barreleye/get-tree-head
-sigsum_log_key:  "4644af2abd40f4895a003bca350f9d5912ab301a49c77f13e5b6d905c20a5fe6"
+sigsum_logs:
+  # https://test.sigsum.org/barreleye/get-tree-head
+  - key:  "4644af2abd40f4895a003bca350f9d5912ab301a49c77f13e5b6d905c20a5fe6"
+    hash: "4e89cc51651f0d95f3c6127c15e1a42e3ddf7046c5b17b752689c402e773bb4d"
+  # https://serviceberry.tlog.stagemole.eu/get-tree-head
+  - key:  "47e481606d8acba747a6b053d6c2d191605fb122175d410a1202a91430abce39"
+    hash: "1643169b32bef33a3f54f8a353b87c475d19b6223cbb106390d10a29978e1cba"
 
 # cosignature=e4a6a1e4657d8d7a187cc0c20ed51055d88c72f340d29534939aee32d86b4021
 sigsum_log_name: "tillitis.se/test-witness-1"

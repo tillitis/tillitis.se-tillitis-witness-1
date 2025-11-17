@@ -1,8 +1,13 @@
 go_version:      "1.23.10"
 witness_version: "v0.5.0"
 
-# https://seasalp.glasklar.is/get-tree-head
-sigsum_log_key:  "0ec7e16843119b120377a73913ac6acbc2d03d82432e2c36b841b09a95841f25"
+sigsum_logs:
+  # https://seasalp.glasklar.is/get-tree-head
+  - key:  "0ec7e16843119b120377a73913ac6acbc2d03d82432e2c36b841b09a95841f25"
+    hash: "44ad38f8226ff9bd27629a41e55df727308d0a1cd8a2c31d3170048ac1dd22a1"
+  # https://ginkgo.tlog.mullvad.net/get-tree-head
+  - key:  "f00c159663d09bbda6131ee1816863b6adcacfe80b0b288000b11aba8fe38314"
+    hash: "c03f05182be9341e33b9edd5f3f8675b08332164640203e743f4285359cace47"
 
 # cosignature=774fafee07d3b0d9399d669676440a6301db9fa8fe2140d7d352418da25144c5
 sigsum_log_name: "tillitis.se/tillitis-witness-1"
