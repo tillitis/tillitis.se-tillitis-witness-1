@@ -1,4 +1,4 @@
 ---
-- name: Enable lingering for user 'witness'
-  ansible.builtin.command: loginctl enable-linger witness
+- name: Enable lingering for login user
+  ansible.builtin.command: loginctl enable-linger {{ ansible_user }}
   become: true

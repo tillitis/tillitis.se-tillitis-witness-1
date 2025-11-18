@@ -8,13 +8,19 @@
   become: true
 
 - name: Check if 'dtoverlay=dwc2,dr_mode=host' exists under [pi5]
-  ansible.builtin.shell: awk '/^\[pi5\]/ { flag=1; next } /^\[/ { flag=0 } flag && /dtoverlay=dwc2,dr_mode=host/' /boot/firmware/config.txt
+  ansible.builtin.shell: >
+    awk
+    '/^\[pi5\]/ { flag=1; next } /^\[/ { flag=0 } flag && /dtoverlay=dwc2,dr_mode=host/'
+    /boot/firmware/config.txt
   register: dtoverlay_check
   changed_when: false
   failed_when: false
 
 - name: Add 'dtoverlay=dwc2,dr_mode=host' line under [pi5] if missing
-  ansible.builtin.command: sed -i '/^\[pi5\]/a dtoverlay=dwc2,dr_mode=host' /boot/firmware/config.txt
+  ansible.builtin.command: >
+    sed -i
+    '/^\[pi5\]/a dtoverlay=dwc2,dr_mode=host'
+    /boot/firmware/config.txt
   when: dtoverlay_check.stdout == ""
   register: dtoverlay_line
   changed_when: dtoverlay_line.rc == 0 and dtoverlay_line.stdout == ""

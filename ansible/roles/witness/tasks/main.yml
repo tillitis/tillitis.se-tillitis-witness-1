@@ -12,7 +12,7 @@
 
 - name: Check litewitness version
   ansible.builtin.command: >
-     {{ gobin }} version -m go/bin/litewitness
+    {{ gobin }} version -m go/bin/litewitness
   register: litewitness_version_output
   ignore_errors: yes
 
@@ -23,7 +23,8 @@
 
 - name: Check if log is already added to witness DB
   ansible.builtin.command: >
-    {{ witnessctl_bin }} list-logs -db {{ witness_db }}
+    {{ witnessctl_bin }} list-logs
+    -db {{ witness_db }}
   register: witness_logs
   changed_when: false
   failed_when: false
@@ -37,8 +38,8 @@
 - name: Add sigsum logs
   ansible.builtin.command: >
     {{ witnessctl_bin }} add-sigsum-log
-    -key {{ item.key }}
     -db {{ witness_db }}
+    -key {{ item.key }}
   loop: "{{ sigsum_logs }}"
   when: item.hash not in witness_logs.stdout
 

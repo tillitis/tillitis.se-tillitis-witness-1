@@ -1,0 +1,8 @@
+---
+- name: Ensure netstat is installed
+  ansible.builtin.apt:
+    name:
+      - net-tools
+    state: present
+    update_cache: yes
+  become: true

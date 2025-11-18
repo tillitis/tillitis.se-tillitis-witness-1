@@ -15,7 +15,7 @@
     group: root
     mode: '0755'
   become: true
-  
+
 - name: Add IPv4 firewall script
   ansible.builtin.copy:
     dest: /etc/iptables/iptables.sh
@@ -178,7 +178,7 @@
     group: root
     mode: '0755'
   become: true
-  
+
 - name: Add IPv4 firewall flush script
   ansible.builtin.copy:
     dest: /etc/iptables/flush-iptables.sh
@@ -277,7 +277,7 @@
     group: root
     mode: '0644'
   become: true
-  
+
 - name: Add IPv6 firewall service
   ansible.builtin.copy:
     dest: /etc/systemd/system/ip6tables.service

@@ -6,6 +6,14 @@
     update_cache: yes
   become: true
 
+- name: Enable English locale in /etc/locale.gen
+  ansible.builtin.lineinfile:
+    path: /etc/locale.gen
+    regexp: '^#?en_US.UTF-8 UTF-8'
+    line: 'en_US.UTF-8 UTF-8'
+    state: present
+  become: true
+
 - name: Enable Swedish locale in /etc/locale.gen
   ansible.builtin.lineinfile:
     path: /etc/locale.gen
@@ -22,7 +30,7 @@
   ansible.builtin.copy:
     dest: /etc/default/locale
     content: |
-      LANG="en_GB.UTF-8"
+      LANG="en_US.UTF-8"
       LC_NUMERIC="sv_SE.UTF-8"
       LC_TIME="sv_SE.UTF-8"
       LC_MONETARY="sv_SE.UTF-8"

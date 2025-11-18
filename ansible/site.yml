@@ -4,12 +4,12 @@
   roles:
     - apt-get-update
 
-- name: Add and configure firewall with ssh port 22 open
+- name: Install and configure firewall with ssh port 22 open
   hosts: all
   roles:
     - firewall
 
-- name: Install unattended-upgrades and configure
+- name: Install and configure unattended-upgrades
   hosts: all
   roles:
     - unattended-upgrades
@@ -23,6 +23,21 @@
   hosts: all
   roles:
     - timesyncd
+
+- name: Configure system timezone
+  hosts: all
+  roles:
+    - timezone
+
+- name: Install netstat
+  hosts: all
+  roles:
+    - netstat
+
+- name: Remove avahi-daemon
+  hosts: all
+  roles:
+    - avahi-daemon
 
 - name: Disable WiFi and Bluetooth
   hosts: all

@@ -1,0 +1,10 @@
+---
+- name: Ensure avahi-daemon and all its dependency packages are removed
+  ansible.builtin.apt:
+    name:
+      - avahi-daemon
+    state: absent
+    purge: true
+    autoremove: true
+    update_cache: yes
+  become: true

@@ -1,0 +1,23 @@
+---
+- name: Ensure tzdata package is installed
+  ansible.builtin.apt:
+    name: tzdata
+    state: present
+    update_cache: yes
+  become: true
+
+- name: Check current timezone
+  ansible.builtin.command: timedatectl show --property=Timezone --value
+  register: timezone_output
+  changed_when: false  # Prevents task from showing "changed"
+
+- name: Configure timezone to Europe/Stockholm
+  ansible.builtin.command: timedatectl set-timezone 'Europe/Stockholm'
+  when: timezone_output.stdout != "Europe/Stockholm"
+  register: timezone_set
+  become: true
+
+- name: Reconfigure tzdata (only when timezone was changed)
+  ansible.builtin.command: dpkg-reconfigure --frontend noninteractive tzdata
+  when: timezone_set.changed
+  become: true

@@ -8,13 +8,19 @@
   become: true
 
 - name: Check if 'dtoverlay=disable-wifi' exists under [pi5]
-  ansible.builtin.shell: awk '/^\[pi5\]/ { flag=1; next } /^\[/ { flag=0 } flag && /dtoverlay=disable-wifi/' /boot/firmware/config.txt
+  ansible.builtin.shell: >
+    awk
+    '/^\[pi5\]/ { flag=1; next } /^\[/ { flag=0 } flag && /dtoverlay=disable-wifi/'
+    /boot/firmware/config.txt
   register: dtoverlay_check_wifi
   changed_when: false
   failed_when: false
 
 - name: Add 'dtoverlay=disable-wifi' line under [pi5] if missing (disable WiFi)
-  ansible.builtin.command: sed -i '/^\[pi5\]/a dtoverlay=disable-wifi' /boot/firmware/config.txt
+  ansible.builtin.command: >
+    sed -i
+    '/^\[pi5\]/a dtoverlay=disable-wifi'
+    /boot/firmware/config.txt
   when: dtoverlay_check_wifi.stdout == ""
   register: dtoverlay_wifi_line
   changed_when: dtoverlay_wifi_line.rc == 0 and dtoverlay_wifi_line.stdout == ""
@@ -25,13 +31,19 @@
   # actions.
   
 - name: Check if 'dtoverlay=disable-bt' exists under [pi5]
-  ansible.builtin.shell: awk '/^\[pi5\]/ { flag=1; next } /^\[/ { flag=0 } flag && /dtoverlay=disable-bt/' /boot/firmware/config.txt
+  ansible.builtin.shell: >
+    awk
+    '/^\[pi5\]/ { flag=1; next } /^\[/ { flag=0 } flag && /dtoverlay=disable-bt/'
+    /boot/firmware/config.txt
   register: dtoverlay_check_bt
   changed_when: false
   failed_when: false
 
 - name: Add 'dtoverlay=disable-bt' line under [pi5] if missing (disable Bluetooth)
-  ansible.builtin.command: sed -i '/^\[pi5\]/a dtoverlay=disable-bt' /boot/firmware/config.txt
+  ansible.builtin.command: >
+    sed -i
+    '/^\[pi5\]/a dtoverlay=disable-bt'
+    /boot/firmware/config.txt
   when: dtoverlay_check_bt.stdout == ""
   register: dtoverlay_bt_line
   changed_when: dtoverlay_bt_line.rc == 0 and dtoverlay_bt_line.stdout == ""
